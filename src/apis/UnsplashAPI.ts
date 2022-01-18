@@ -1,6 +1,4 @@
 import APIWrapper from '@structures/APIWrapper'
-// eslint-disable-next-line no-unused-vars
-import { AxiosError } from 'axios'
 
 const UnsplashAPI = class extends APIWrapper {
   constructor () {
