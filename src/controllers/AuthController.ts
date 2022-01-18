@@ -3,9 +3,10 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import _ from 'lodash'
 
-import GenericException from '@exceptions/GenericException'
-import UserModel from '@models/UserModel'
 import AuthException from '@exceptions/AuthException'
+import GenericException from '@exceptions/GenericException'
+
+import UserModel from '@models/UserModel'
 
 export default class AuthController {
   public static async login (req: Request, res: Response) {
