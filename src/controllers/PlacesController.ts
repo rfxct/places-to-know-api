@@ -14,7 +14,10 @@ export default class PlacesController {
 
     const places = await PlaceModel.find({
       searchableName: { $regex: `.*${removeDiacritics(search as string)}.*`, $options: 'i' }
-    }, '_id name photo').sort({ [order as string]: 1 }).skip(perPage * (page - 1)).limit(perPage)
+    }).select('_id name photo')
+      .sort({ [order as string]: 1 })
+      .skip(perPage * (page - 1))
+      .limit(perPage)
 
     res.status(200).json(places)
   }
@@ -32,7 +35,7 @@ export default class PlacesController {
     const { name } = req.body
 
     const alreadyExists = await PlaceModel.findOne({ name })
-    if (alreadyExists) throw new GenericException('Já existe um local cadastrado com este nome')
+    if (alreadyExists) throw new GenericException('Já existe um local cadastrado com este nome', 409, 'PLACE_ALREADY_EXISTS')
 
     const { data } = await UnsplashAPI.getRandomPhoto(name)
     const { _doc: document } = await PlaceModel.create({ name, photo: data?.urls?.full ?? null })
