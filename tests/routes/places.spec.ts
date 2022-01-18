@@ -14,6 +14,12 @@ describe('POST /places', () => {
     .query({ query: 'Boituva' })
     .reply(200, unsplash.photosRandom)
 
+  it('should return a unauthorized error', async () => {
+    const result = await request(app).post('/places').expect(401)
+
+    expect(result.body.message).toEqual('Você precisa estar autenticado para acessar este recurso')
+  })
+
   it('should return validation error', async () => {
     const response = await request(app).post('/places')
       .set('Authorization', `Bearer ${token}`)
@@ -27,7 +33,7 @@ describe('POST /places', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ name: 'Boituva' })
       .expect(201)
-    console.log(response.body)
+
     expect(response.body).toHaveProperty('_id')
     expect(response.body.name).toEqual('Boituva')
   })
@@ -43,6 +49,12 @@ describe('POST /places', () => {
 })
 
 describe('GET /places', () => {
+  it('should return a unauthorized error', async () => {
+    const result = await request(app).get('/places').expect(401)
+
+    expect(result.body.message).toEqual('Você precisa estar autenticado para acessar este recurso')
+  })
+
   it('should return all places with default limit', async () => {
     const count = await mongoose.models.Place.count({}).exec()
     const amount = count > 50 ? 50 : count
