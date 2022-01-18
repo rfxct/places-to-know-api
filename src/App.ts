@@ -4,7 +4,7 @@ import swaggerUi from 'swagger-ui-express'
 
 import routes from './routes'
 import swaggerOutput from './docs/swagger_output.json'
-import handleError from './utils/handleError'
+import handleError from '@utils/handleError'
 
 const app = express()
 
