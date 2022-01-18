@@ -2,8 +2,8 @@ import { checkSchema } from 'express-validator'
 const capitalize = (str: string) => str[0].toUpperCase() + str.slice(1).toLowerCase()
 
 export default class AuthValidator {
-  // Auth
-  public static auth = checkSchema({
+  // Login
+  public static login = checkSchema({
     email: {
       isEmail: { errorMessage: 'O e-mail fornecido é inválido' }
     },
@@ -14,8 +14,8 @@ export default class AuthValidator {
     }
   })
 
-  // Login
-  public static store = checkSchema({
+  // REgister
+  public static register = checkSchema({
     name: {
       custom: {
         errorMessage: 'Forneça o primeiro e o último nome (utilize somente letras)',

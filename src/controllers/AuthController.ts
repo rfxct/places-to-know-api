@@ -8,16 +8,14 @@ import UserModel from '@models/UserModel'
 import AuthException from '@exceptions/AuthException'
 
 export default class AuthController {
-  public static async authenticate (req: Request, res: Response) {
+  public static async login (req: Request, res: Response) {
     const { email, password } = req.body
 
-    const user = await UserModel.findOne({ email })
+    const user = await UserModel.findOne({ email }, 'name email password')
     const passwordIsValid = !!user?.password && await bcrypt.compare(password, user.password)
     if (!passwordIsValid) throw new AuthException('As credenciais de acesso fornecidas estão inválidas')
 
-    // Remover campos sensíveis/indesejados
-    const toRemove = ['__v', 'password']
-    const sanitized = _.omitBy(user._doc, (_value, key) => toRemove.includes(key))
+    const sanitized = _.omitBy({ ...user._doc, password: null }, _.isNull)
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: '7d' })
     res.status(200).send({ token, user: sanitized })
