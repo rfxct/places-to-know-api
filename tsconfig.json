@@ -19,7 +19,8 @@
       "@controllers/*": ["./src/controllers/*"],
       "@validators/*": ["./src/validators/*"],
       "@structures/*": ["./src/structures/*"],
-      "@apis/*": ["./src/apis/*"]
+      "@apis/*": ["./src/apis/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "files": [
