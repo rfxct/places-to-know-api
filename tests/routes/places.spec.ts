@@ -1,4 +1,5 @@
 import request from 'supertest'
+import mongoose from 'mongoose'
 import nock from 'nock'
 
 import bootstrap from '../bootstrap'
@@ -38,5 +39,38 @@ describe('POST /places', () => {
       .expect(409)
 
     expect(response.body.code).toEqual('PLACE_ALREADY_EXISTS')
+  })
+})
+
+describe('GET /places', () => {
+  it('should return all places with default limit', async () => {
+    const count = await mongoose.models.Place.count({}).exec()
+    const amount = count > 50 ? 50 : count
+
+    const response = await request(app).get('/places')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ limit: amount })
+      .expect(200)
+
+    expect(response.body.constructor.name).toEqual('Array')
+    expect(response.body.length).toEqual(amount)
+  })
+
+  it('should return places ordered by name', async () => {
+    const response = await request(app).get('/places')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ order: 'name' })
+      .expect(200)
+
+    expect(response.body[0].name).toEqual('Boituva')
+  })
+
+  it('should return a Maringá place document', async () => {
+    const response = await request(app).get('/places')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ search: 'ringa' })
+      .expect(200)
+
+    expect(response.body[0].name).toEqual('Maringá')
   })
 })
