@@ -171,6 +171,9 @@
                 },
                 "name": {
                   "example": "any"
+                },
+                "forcePhotoUpdate": {
+                  "example": "any"
                 }
               }
             }
