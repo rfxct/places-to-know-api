@@ -8,16 +8,18 @@ import * as unsplash from '../payloads/unsplash'
 
 const { token, defaultPlaces } = bootstrap()
 
+beforeEach(() => nock.cleanAll())
+
 describe('POST /places', () => {
   nock('https://api.unsplash.com')
     .get('/photos/random')
     .query({ query: 'Boituva' })
-    .reply(200, unsplash.photosRandom)
+    .reply(200, unsplash.boituvaData)
 
   it('should return a unauthorized error', async () => {
     const result = await request(app).post('/places').expect(401)
 
-    expect(result.body.message).toEqual('Você precisa estar autenticado para acessar este recurso')
+    expect(result.body.code).toEqual('UNAUTHORIZED_ACCESS')
   })
 
   it('should return validation error', async () => {
@@ -52,7 +54,7 @@ describe('GET /places', () => {
   it('should return a unauthorized error', async () => {
     const result = await request(app).get('/places').expect(401)
 
-    expect(result.body.message).toEqual('Você precisa estar autenticado para acessar este recurso')
+    expect(result.body.code).toEqual('UNAUTHORIZED_ACCESS')
   })
 
   it('should return all places with default limit', async () => {
@@ -91,7 +93,7 @@ describe('GET /places/:placeId', () => {
   it('should return a unauthorized error', async () => {
     const result = await request(app).get('/places/----------').expect(401)
 
-    expect(result.body.message).toEqual('Você precisa estar autenticado para acessar este recurso')
+    expect(result.body.code).toEqual('UNAUTHORIZED_ACCESS')
   })
 
   it('should return a invalid id error', async () => {
@@ -117,5 +119,48 @@ describe('GET /places/:placeId', () => {
       .expect(200)
 
     expect(response.body._id).toEqual(documentId)
+  })
+})
+
+describe('PUT /places/', () => {
+  nock('https://api.unsplash.com')
+    .get('/photos/random')
+    .query({ query: 'Botucatu' })
+    .reply(200, unsplash.botucatuData)
+
+  it('should return a unauthorized error', async () => {
+    const result = await request(app).put('/places').expect(401)
+
+    expect(result.body.code).toEqual('UNAUTHORIZED_ACCESS')
+  })
+
+  it('should return a validation error', async () => {
+    const response = await request(app).put('/places/')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
+
+    expect(response.body.errors).toHaveLength(2)
+  })
+
+  it('should update and return place successfully', async () => {
+    const document = defaultPlaces[1]
+    const response = await request(app).put('/places/')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ _id: document._id.toString(), name: 'Botucatu' })
+      .expect(200)
+
+    expect(response.body.name).toEqual('Botucatu')
+    expect(response.body.photo).not.toEqual(document.photo)
+  })
+
+  it('should not update and return place successfully', async () => {
+    const document = defaultPlaces[0]
+    const response = await request(app).put('/places/')
+      .set('Authorization', `Bearer ${token}`)
+      .send(document)
+      .expect(200)
+
+    expect(response.body.name).toEqual(document.name)
+    expect(response.body.photo).toEqual(document.photo)
   })
 })
