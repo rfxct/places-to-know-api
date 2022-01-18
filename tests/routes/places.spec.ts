@@ -164,3 +164,36 @@ describe('PUT /places/', () => {
     expect(response.body.photo).toEqual(document.photo)
   })
 })
+
+describe('DELETE /places/:placeId', () => {
+  it('should return a unauthorized error', async () => {
+    const result = await request(app).delete('/places/----------').expect(401)
+
+    expect(result.body.code).toEqual('UNAUTHORIZED_ACCESS')
+  })
+
+  it('should return a invalid id error', async () => {
+    const response = await request(app).delete('/places/----------')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
+
+    expect(response.body.errors[0].param).toEqual('placeId')
+  })
+
+  it('should return not found error', async () => {
+    const response = await request(app).delete(`/places/${new mongoose.Types.ObjectId()}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404)
+
+    expect(response.body.code).toEqual('INEXISTENT_PLACE')
+  })
+
+  it('should delete and return place successfully', async () => {
+    const documentId = defaultPlaces[0]._id.toString()
+    const response = await request(app).delete(`/places/${documentId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+
+    expect(response.body._id).toEqual(documentId)
+  })
+})
