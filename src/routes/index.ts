@@ -1,16 +1,22 @@
 import 'express-async-errors'
 import { Router } from 'express'
 
+import ValidateRequestMiddleware from '@middlewares/ValidateRequestMiddleware'
+import AuthMiddleware from '@middlewares/AuthMiddleware'
+
 import AuthController from '@controllers/AuthController'
 import AuthValidator from '@validators/AuthValidator'
 
-import ValidateRequestMiddleware from '@middlewares/ValidateRequestMiddleware'
-// import AuthMiddleware from '@middlewares/AuthMiddleware'
+import PlacesController from '@controllers/PlacesController'
+import PlacesValidator from '@validators/PlacesValidator'
 
 const router = Router()
 
 // Auth
-router.post('/login', AuthValidator.auth, ValidateRequestMiddleware, AuthController.authenticate)
-router.post('/register', AuthValidator.store, ValidateRequestMiddleware, AuthController.register)
+router.post('/login', AuthValidator.login, ValidateRequestMiddleware, AuthController.login)
+router.post('/register', AuthValidator.register, ValidateRequestMiddleware, AuthController.register)
 
+// Places
+router.post('/places', PlacesValidator.store, ValidateRequestMiddleware, AuthMiddleware, PlacesController.store)
+router.get('/places', AuthMiddleware, PlacesController.index)
 export default router
