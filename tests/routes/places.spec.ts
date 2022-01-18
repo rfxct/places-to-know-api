@@ -6,7 +6,7 @@ import bootstrap from '../bootstrap'
 import app from '../../src/App'
 import * as unsplash from '../payloads/unsplash'
 
-const { token } = bootstrap()
+const { token, defaultPlaces } = bootstrap()
 
 describe('POST /places', () => {
   nock('https://api.unsplash.com')
@@ -84,5 +84,38 @@ describe('GET /places', () => {
       .expect(200)
 
     expect(response.body[0].name).toEqual('Maringá')
+  })
+})
+
+describe('GET /places/:placeId', () => {
+  it('should return a unauthorized error', async () => {
+    const result = await request(app).get('/places/----------').expect(401)
+
+    expect(result.body.message).toEqual('Você precisa estar autenticado para acessar este recurso')
+  })
+
+  it('should return a invalid id error', async () => {
+    const response = await request(app).get('/places/----------')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400)
+
+    expect(response.body.errors[0].param).toEqual('placeId')
+  })
+
+  it('should return not found error', async () => {
+    const response = await request(app).get(`/places/${new mongoose.Types.ObjectId()}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(404)
+
+    expect(response.body.code).toEqual('INEXISTENT_PLACE')
+  })
+
+  it('should return a place successfully', async () => {
+    const documentId = defaultPlaces[0]._id.toString()
+    const response = await request(app).get(`/places/${documentId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+
+    expect(response.body._id).toEqual(documentId)
   })
 })
