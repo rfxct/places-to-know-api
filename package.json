@@ -6,7 +6,7 @@
   "author": "marc <xbrcvar@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=12.x"
+    "node": ">=16.x"
   },
   "scripts": {
     "dev": "tsnd --files --respawn --ignore-watch src/docs/swagger_output.json --transpile-only -r tsconfig-paths/register -r dotenv/config index.ts",
