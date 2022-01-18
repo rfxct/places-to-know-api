@@ -17,10 +17,10 @@ router.post('/login', AuthValidator.login, ValidateRequestMiddleware, AuthContro
 router.post('/register', AuthValidator.register, ValidateRequestMiddleware, AuthController.register)
 
 // Places
-router.post('/places', PlacesValidator.store, ValidateRequestMiddleware, AuthMiddleware, PlacesController.store)
+router.post('/places', AuthMiddleware, PlacesValidator.store, ValidateRequestMiddleware, PlacesController.store)
 router.get('/places', AuthMiddleware, PlacesController.index)
-router.get('/places/:placeId', PlacesValidator.checkIdParam, ValidateRequestMiddleware, AuthMiddleware, PlacesController.show)
-router.put('/places/', PlacesValidator.put, ValidateRequestMiddleware, AuthMiddleware, PlacesController.put)
-router.delete('/places/:placeId', PlacesValidator.checkIdParam, ValidateRequestMiddleware, AuthMiddleware, PlacesController.delete)
+router.get('/places/:placeId', AuthMiddleware, PlacesValidator.checkIdParam, ValidateRequestMiddleware, PlacesController.show)
+router.put('/places/', AuthMiddleware, PlacesValidator.put, ValidateRequestMiddleware, PlacesController.put)
+router.delete('/places/:placeId', AuthMiddleware, PlacesValidator.checkIdParam, ValidateRequestMiddleware, PlacesController.delete)
 
 export default router
