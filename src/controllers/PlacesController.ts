@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Request, Response } from 'express'
 
 import GenericException from '@exceptions/GenericException'
@@ -14,8 +13,8 @@ export default class PlacesController {
     const perPage = Number(limit) || Number(process.env.PAGINATION_ITEMS_LIMIT) || 50
 
     const places = await PlaceModel.find({
-      searchableName: { $regex: `.*${removeDiacritics(search)}.*`, $options: 'i' }
-    }, '_id name photo').sort({ [order]: 1 }).skip(perPage * (page - 1)).limit(perPage)
+      searchableName: { $regex: `.*${removeDiacritics(search as string)}.*`, $options: 'i' }
+    }, '_id name photo').sort({ [order as string]: 1 }).skip(perPage * (page - 1)).limit(perPage)
 
     res.status(200).json(places)
   }
@@ -65,7 +64,7 @@ export default class PlacesController {
   public static async delete (req: Request, res: Response) {
     const { placeId } = req.params
 
-    const place = await PlaceModel.findOneAndDelete({ _id: placeId }, '_id name photo')
+    const place = await PlaceModel.findByIdAndDelete(placeId).select('_id name photo')
     if (!place?._doc) throw new GenericException('O id fornecido não pertence a nenhum registro', 404, 'INEXISTENT_PLACE')
 
     res.status(200).json(place._doc)
