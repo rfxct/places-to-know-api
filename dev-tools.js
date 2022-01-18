@@ -2,19 +2,27 @@ const fs = require('fs')
 const path = require('path')
 
 const [, , command, ...args] = process.argv
+const models = fs.readdirSync('./templates')
 
-switch (command) {
-  case 'create:controller': {
-    if (!args[0]) return die('Forneça um nome para o Controller')
+if (command.toLowerCase().startsWith('create')) {
+  const structure = capitalize(command.split(':').pop())
+  if (!models.includes(structure)) die('Estrutura inválida')
 
-    const controllerName = capitalize(args[0]).replace('controller', '') + 'Controller'
-    const fullPath = path.resolve('src', 'controllers', `${controllerName}.ts`)
+  const model = fs.readFileSync(`./templates/${structure}`, { encoding: 'utf-8' })
+  return createStructure(structure, model.toString())
+} else {
+  die('Nenhum comando especificado')
+}
 
-    fs.writeFileSync(fullPath, `export default class ${controllerName} {\n\n}\n`, { encoding: 'utf-8' })
-    console.log(`O controller ${controllerName} foi criado`)
-    break
-  }
-  default: die('Nenhum comando especificado')
+// Functions
+function createStructure (structureName, fileContent) {
+  if (!args[0]) return die(`Forneça um nome para a estrutura ${structureName}`)
+
+  const resolvedName = capitalize(args[0]).replace(new RegExp(structureName, 'igm'), '')
+  const fullPath = path.resolve('src', `${structureName.toLowerCase()}s`, `${resolvedName}${structureName}.ts`)
+
+  fs.writeFileSync(fullPath, fileContent.replace(/{{name}}/igm, resolvedName), { encoding: 'utf-8' })
+  console.log(`O arquivo ${structureName}${resolvedName} foi criado (${fullPath})`)
 }
 
 function die (message) {

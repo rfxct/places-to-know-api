@@ -1,0 +1,7 @@
+import { Schema, model } from 'mongoose'
+
+const {{name}}Schema = new Schema({
+  // content
+})
+
+export default model('{{name}}', {{name}}Schema)
