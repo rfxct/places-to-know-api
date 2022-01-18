@@ -13,10 +13,26 @@ export default class PlacesValidator {
         options: (value) => value && isValidObjectId(value) ? new mongo.ObjectId(value) : value
       }
     }
-
   })
 
   public static store = checkSchema({
+    name: {
+      isLength: {
+        errorMessage: 'O nome do lugar não pode estar vazio', options: { min: 1 }
+      }
+    }
+  })
+
+  public static put = checkSchema({
+    _id: {
+      custom: {
+        errorMessage: 'O id fornecido é inválido',
+        options: (value) => value && isValidObjectId(value)
+      },
+      customSanitizer: {
+        options: (value) => value && isValidObjectId(value) ? new mongo.ObjectId(value) : value
+      }
+    },
     name: {
       isLength: {
         errorMessage: 'O nome do lugar não pode estar vazio', options: { min: 1 }
