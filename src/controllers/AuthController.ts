@@ -33,9 +33,7 @@ export default class AuthController {
     const password = await bcrypt.hash(rawPassword, Number(process.env.BCRYPT_SALT_ROUNDS) || 5)
     const { _doc: document } = await UserModel.create({ name, password, email })
 
-    // Remover campos sensíveis/indesejados
-    const toRemove = ['__v', 'password']
-    const sanitized = _.omitBy(document, (_value, key) => toRemove.includes(key))
+    const sanitized = _.omitBy({ ...document, password: null }, _.isNull)
 
     res.status(201).json({
       message: 'Usuário criado com sucesso',

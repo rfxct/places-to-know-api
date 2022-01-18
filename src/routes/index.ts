@@ -22,4 +22,5 @@ router.get('/places', AuthMiddleware, PlacesController.index)
 router.get('/places/:placeId', PlacesValidator.checkIdParam, ValidateRequestMiddleware, AuthMiddleware, PlacesController.show)
 router.put('/places/', PlacesValidator.put, ValidateRequestMiddleware, AuthMiddleware, PlacesController.put)
 router.delete('/places/:placeId', PlacesValidator.checkIdParam, ValidateRequestMiddleware, AuthMiddleware, PlacesController.delete)
+
 export default router
