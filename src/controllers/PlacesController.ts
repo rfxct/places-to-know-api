@@ -5,6 +5,7 @@ import UnsplashAPI from '@apis/UnsplashAPI'
 import PlaceModel from '@models/PlaceModel'
 
 import removeDiacritics from '@utils/removeDiacritis'
+import IUnsplashPhoto from '@interfaces/IUnsplashPhoto'
 
 export default class PlacesController {
   public static async index (req: Request, res: Response) {
@@ -44,21 +45,21 @@ export default class PlacesController {
   }
 
   public static async put (req: Request, res: Response) {
-    const { _id, name } = req.body
+    const { _id, name, forcePhotoUpdate } = req.body
 
     const placeExists = await PlaceModel.findOne({ _id }, '_id name photo')
     if (!placeExists) throw new GenericException('O id fornecido não pertence a nenhum registro', 404, 'INEXISTENT_PLACE')
-    if (placeExists.name.toLowerCase() === name.toLowerCase()) {
+    if (!forcePhotoUpdate && placeExists.name.toLowerCase() === name.toLowerCase()) {
       return res.status(200).json({ ...placeExists._doc, name })
     }
 
-    const equal = removeDiacritics(placeExists.name) === removeDiacritics(name)
-    const defaultPayload = { status: 200, data: { urls: { full: placeExists.photo } } }
+    const makeRequest = forcePhotoUpdate || removeDiacritics(placeExists.name) !== removeDiacritics(name)
+    const defaultPayload = { urls: { full: placeExists.photo } }
 
-    const { data } = equal ? defaultPayload : await UnsplashAPI.getRandomPhoto(name)
+    const photo: IUnsplashPhoto = (makeRequest ? await UnsplashAPI.getUniquePhoto(name, placeExists?.photo) : defaultPayload)
 
     const place = await PlaceModel
-      .findOneAndUpdate({ _id }, { name, photo: data?.urls?.full ?? null }, { new: true })
+      .findOneAndUpdate({ _id }, { name, photo: photo?.urls?.full ?? null }, { new: true })
       .select('_id name photo')
 
     res.status(200).json(place._doc)
