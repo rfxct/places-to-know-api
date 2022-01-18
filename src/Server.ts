@@ -1,3 +1,4 @@
+import fs from 'fs/promises'
 import mongoose from 'mongoose'
 import { Signale } from 'signale'
 
@@ -21,10 +22,27 @@ export default class Server {
   }
 
   public async start () {
+    await this.checkAPIs()
     await this.mongooseConnect()
+
     this.app.listen(this.applicationPort, () =>
       this.log.scope('Servidor').success('Servidor iniciado com sucesso')
     )
+  }
+
+  public async checkAPIs () {
+    const apis = (await fs.readdir('./src/apis'))
+
+    for (const name of apis) {
+      const { default: instance } = require(`./apis/${name}`)
+
+      try {
+        instance.checkEnvs()
+      } catch (e: Error | any) {
+        this.log.scope(instance.constructor.name).error(e.message)
+        if (instance.necessary) process.exit(1)
+      }
+    }
   }
 
   public async mongooseConnect () {

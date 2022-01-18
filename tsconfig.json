@@ -17,7 +17,9 @@
       "@exceptions/*": ["./src/exceptions/*"],
       "@middlewares/*": ["./src/middlewares/*"],
       "@controllers/*": ["./src/controllers/*"],
-      "@validators/*": ["./src/validators/*"]
+      "@validators/*": ["./src/validators/*"],
+      "@structures/*": ["./src/structures/*"],
+      "@apis/*": ["./src/apis/*"]
     }
   },
   "files": [
