@@ -8,6 +8,7 @@ declare global {
       CONNECTION_ATTEMPTS_LIMIT: number
       CONNECTION_ATTEMPTS_MS_TO_RETRY: number
       BCRYPT_SALT_ROUNDS: number
+      PAGINATION_ITEMS_LIMIT: number
       JWT_SECRET: string
       UNSPLASH_ACCESS_KEY: string
     }
