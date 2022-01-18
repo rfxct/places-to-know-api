@@ -35,13 +35,31 @@ export default class PlacesController {
     const alreadyExists = await PlaceModel.findOne({ name })
     if (alreadyExists) throw new GenericException('Já existe um local cadastrado com este nome')
 
-    const { status, data } = await UnsplashAPI.getRandomPhoto(name)
-    if (status !== 200) {
-      throw new GenericException('Ocorreu um erro ao obter a imagem')
+    const { data } = await UnsplashAPI.getRandomPhoto(name)
+    const { _doc: document } = await PlaceModel.create({ name, photo: data?.urls?.full ?? null })
+
+    res.status(201).json(document)
+  }
+
+  public static async put (req: Request, res: Response) {
+    const { _id, name } = req.body
+
+    const placeExists = await PlaceModel.findOne({ _id }, '_id name photo')
+    if (!placeExists) throw new GenericException('O id fornecido não pertence a nenhum registro', 404, 'INEXISTENT_PLACE')
+    if (placeExists.name.toLowerCase() === name.toLowerCase()) {
+      return res.status(200).json({ ...placeExists._doc, name })
     }
 
-    const { _doc: document } = await PlaceModel.create({ name, photo: data?.urls?.full ?? null })
-    res.status(201).json(document)
+    const equal = removeDiacritics(placeExists.name) === removeDiacritics(name)
+    const defaultPayload = { status: 200, data: { urls: { full: placeExists.photo } } }
+
+    const { data } = equal ? defaultPayload : await UnsplashAPI.getRandomPhoto(name)
+
+    const place = await PlaceModel
+      .findOneAndUpdate({ _id }, { name, photo: data?.urls?.full ?? null }, { new: true })
+      .select('_id name photo')
+
+    res.status(200).json(place._doc)
   }
 
   public static async delete (req: Request, res: Response) {
