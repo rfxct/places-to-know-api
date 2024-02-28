@@ -1,8 +1,3 @@
-﻿# Informações
-| E-mail                    | LinkedIn                           |
-|---------------------------|------------------------------------|
-| mvrcos.ferreira@gmail.com | https://www.linkedin.com/in/rfxct/ |
-
 <a href="./dist/collection-insomnia.json">Collection Insomnia</a>
 
 # Projeto
